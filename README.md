@@ -37,6 +37,12 @@ cd $HOME\bitaxe-tuner; powershell -ExecutionPolicy Bypass -File .\bitaxe-tuner.p
 
 Every option in this README works the same way after `bitaxe-tuner.ps1`. The helper keeps the PC awake while it runs. If `nmap` is missing, `--scan` offers to install it with winget.
 
+Note: If you already know the IP address of your miner, run this command to get started (replace the example address with yours):
+
+```
+cd $HOME\bitaxe-tuner; powershell -ExecutionPolicy Bypass -File .\bitaxe-tuner.ps1 192.168.1.109
+```
+
 ## Quick start
 
 Find your miners and pick one:
