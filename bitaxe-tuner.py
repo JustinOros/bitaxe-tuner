@@ -939,7 +939,15 @@ def local_subnet():
     return str(ipaddress.ip_network(ip + "/24", strict=False))
 
 
+def add_nmap_to_path():
+    for d in (os.environ.get("ProgramFiles(x86)"), os.environ.get("ProgramFiles")):
+        if d and os.path.isfile(os.path.join(d, "Nmap", "nmap.exe")):
+            os.environ["PATH"] = os.path.join(d, "Nmap") + os.pathsep + os.environ.get("PATH", "")
+
+
 def ensure_nmap():
+    if sys.platform == "win32":
+        add_nmap_to_path()
     if shutil.which("nmap"):
         return True
     print("nmap is not installed")
@@ -950,6 +958,11 @@ def ensure_nmap():
             print("Homebrew was not found, install it from https://brew.sh first")
             return False
         cmd = ["brew", "install", "nmap"]
+    elif sys.platform == "win32":
+        if not shutil.which("winget"):
+            print("winget was not found, install nmap from https://nmap.org/download first")
+            return False
+        cmd = ["winget", "install", "-e", "--id", "Insecure.Nmap"]
     elif shutil.which("apt-get"):
         cmd = ["sudo", "apt-get", "install", "-y", "nmap"]
     elif shutil.which("dnf"):
@@ -963,6 +976,8 @@ def ensure_nmap():
     except Exception as e:
         print("install failed: %s" % e)
         return False
+    if sys.platform == "win32":
+        add_nmap_to_path()
     return bool(shutil.which("nmap"))
 
 
