@@ -193,4 +193,4 @@ These are written in the folder you run the tool from.
 
 ## License
 
-Add the license of your choice before sharing.
+MIT. See the LICENSE file.
