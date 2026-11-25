@@ -23,13 +23,19 @@ Built and tested on Bitaxe Gamma 601 boards (BM1370). Other chips run with conse
 
 ## Windows
 
-Use the PowerShell helper. It looks for Python, offers to install it if missing (a portable copy inside the folder, or system wide with winget), then runs the tuner and keeps the PC awake while it works. Every option works the same way.
+Paste this into PowerShell. It downloads the helper script, which finds Python (and offers to install it if missing, as a portable copy in the folder or system wide with winget), downloads the tuner, then scans your network for miners:
 
 ```
-powershell -ExecutionPolicy Bypass -File .\bitaxe-tuner.ps1 --scan
+mkdir $HOME\bitaxe-tuner -Force | Out-Null; cd $HOME\bitaxe-tuner; iwr https://raw.githubusercontent.com/JustinOros/bitaxe-tuner/main/bitaxe-tuner.ps1 -OutFile bitaxe-tuner.ps1; powershell -ExecutionPolicy Bypass -File .\bitaxe-tuner.ps1 --scan
 ```
 
-If `nmap` is missing, `--scan` offers to install it with winget.
+To run it again later:
+
+```
+cd $HOME\bitaxe-tuner; powershell -ExecutionPolicy Bypass -File .\bitaxe-tuner.ps1 --scan
+```
+
+Every option in this README works the same way after `bitaxe-tuner.ps1`. The helper keeps the PC awake while it runs. If `nmap` is missing, `--scan` offers to install it with winget.
 
 ## Quick start
 
