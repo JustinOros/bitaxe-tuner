@@ -528,7 +528,11 @@ def prepare(c):
     if bk and bk.get("in_progress") and (bk.get("original_f"), bk.get("original_v")) != (cur_f, cur_v) and not c.dry_run:
         print("a previous run on %s did not finish: original settings were %d MHz / %d mV, the miner is at %d MHz / %d mV" % (
             c.host, bk["original_f"], bk["original_v"], cur_f, cur_v))
-        if c.yes or input("restore the original settings first? [Y/n] ").strip().lower() != "n":
+        try:
+            answer = "y" if c.yes else input("restore the original settings first? [Y/n] ").strip().lower()
+        except EOFError:
+            answer = "y"
+        if answer != "n":
             if apply_with_retry(c.host, bk["original_f"], bk["original_v"]):
                 try:
                     d, model, prof, cur_f, cur_v = detect(c)
@@ -707,7 +711,11 @@ def pick_option(c, ctx, passing, entries):
         print("%-3s Keep current settings (%d / %d, %.2f TH/s, %.1f W)" % (
             keep_n, ctx["cur_f"], ctx["cur_v"], ctx["cur_hash"], ctx["cur_power"]))
         print("%-3s Show all passing combos" % all_n)
-        ans = input("\nchoose an option [1]: ").strip()
+        try:
+            ans = input("\nchoose an option [1]: ").strip()
+        except EOFError:
+            print("no answer given, keeping the current settings")
+            return None
         if not ans:
             return entries[0][1]
         if not ans.isdigit():
@@ -1190,6 +1198,8 @@ def main():
     signal.signal(signal.SIGTERM, on_signal)
     if hasattr(signal, "SIGHUP"):
         signal.signal(signal.SIGHUP, on_signal)
+    if hasattr(signal, "SIGBREAK"):
+        signal.signal(signal.SIGBREAK, on_signal)
 
     if args.revert:
         revert_hosts(hosts)

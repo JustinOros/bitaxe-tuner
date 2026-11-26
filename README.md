@@ -87,6 +87,29 @@ Keep a miner cool through hot weather (runs until you press Ctrl+C):
 python3 bitaxe-tuner.py 192.168.1.103 --watch
 ```
 
+## Live dashboard
+
+`bitaxe-monitor.py` is a web dashboard for watching your miners in real time. It scans your network, finds every Bitaxe and AxeOS miner, and shows live hashrate, temperature, power, efficiency, error rate, input voltage and shares, with charts over time. The Monitor tab only reads from your miners. The Tuner tab can change their settings, and only when you press Start tuning or Revert.
+
+```
+python3 bitaxe-monitor.py
+```
+
+It opens in your browser at `http://127.0.0.1:8765/`. Add `--lan` to open it from your phone or another computer on your network.
+
+- Click Refresh to scan the network again after adding a miner, or type an address in the add box.
+- Click a miner card for detailed charts and every stat.
+- Pick a time range from 5 minutes to 30 days. History is saved in `bitaxe-monitor.db`, so it keeps building across restarts.
+- Switch between Fahrenheit and Celsius, and between dark and light mode.
+- Each miner is labeled SOLO or POOL based on the pool it is connected to. The Mining mode and rewards panel shows where rewards go, the current block reward in BTC and USD, your odds of finding a block, and your average earnings. Pools it does not recognize are labeled unknown.
+- Block found alerts: if a miner reports a block (AxeOS 2.11 or newer), a banner and confetti appear, and the bell button turns on browser notifications. Confirm any find on your pool page and mempool.space.
+- Bitcoin price, network data and pool statistics come from mempool.space and your pool's public pages. Use `--offline` to turn that off.
+- Compact view: the button next to the dark mode button switches to a denser layout that fits more on one screen. The choice is remembered.
+- Trash: hover over any card or panel and click the x to take it off the dashboard. The trash button in the top bar lists everything you removed, with Restore for each item and Restore all. This only hides it, and the miner keeps being monitored.
+- Drag any card or panel to reorder it. Your layout is remembered, and Reset layout restores the default.
+- Tuner tab: run `bitaxe-tuner.py` from the browser. Pick a miner, a goal and a test length, preview the plan, then start. It shows live progress, a results table and chart, and the full log. Stop puts the original settings back. Each finished tune saves Balanced, Efficient and Fast profiles for that miner in `bitaxe-monitor-profiles.json`. The Profiles section shows them with an Apply button, marks the one in use, and Rebuild from saved results creates profiles from a tune you ran earlier. Keep `bitaxe-tuner.py` in the same folder as the monitor, or the tab offers to download it. There is no password, so only use `--lan` on a network you trust.
+- Options: `--port`, `--lan`, `--interval`, `--subnet`, `--no-scan`, `--no-browser`, `--max-days`, `--offline`.
+
 ## How a tune works
 
 1. Reads the miner's model, current frequency, voltage, power and input voltage.
@@ -193,4 +216,4 @@ These are written in the folder you run the tool from.
 
 ## License
 
-MIT. See the LICENSE file.
+Add the license of your choice before sharing.
