@@ -1697,7 +1697,7 @@ function playFanfare(){
 function alertSound(){if(soundOn())playFanfare()}
 function alertRepeat(on){
   if(on&&soundOn()){
-    if(!SND.repeat){SND.count=0;SND.repeat=setInterval(()=>{if(!soundOn()){alertRepeat(false);return}playFanfare()},60000)}
+    if(!SND.repeat){SND.count=0;SND.repeat=setInterval(()=>{if(!soundOn()){alertRepeat(false);return}playFanfare();confetti()},60000)}
   }else if(SND.repeat){clearInterval(SND.repeat);SND.repeat=null}
 }
 function soundSync(){
@@ -1710,7 +1710,7 @@ $("#soundBtn").onclick=e=>{e.stopPropagation();const pop=$("#soundPop");$("#tras
 $("#soundPop").addEventListener("click",e=>{
   e.stopPropagation();
   if(e.target.closest("#sndToggle")){store("sound",soundOn()?"0":"1");if(!soundOn())alertRepeat(false);soundSync();if(soundOn())playFanfare()}
-  if(e.target.closest("#sndTest")){if(!playFanfare())say("This browser could not play sound")}
+  if(e.target.closest("#sndTest")){if(!playFanfare())say("This browser could not play sound");confetti()}
 });
 document.addEventListener("click",()=>{$("#soundPop").classList.remove("on");sndCtx()});
 document.addEventListener("keydown",()=>{sndCtx()},{once:true});
