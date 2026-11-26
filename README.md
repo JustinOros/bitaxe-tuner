@@ -103,6 +103,7 @@ It opens in your browser at `http://127.0.0.1:8765/`. Add `--lan` to open it fro
 - Switch between Fahrenheit and Celsius, and between dark and light mode.
 - Each miner is labeled SOLO or POOL based on the pool it is connected to. The Mining mode and rewards panel shows where rewards go, the current block reward in BTC and USD, your odds of finding a block, and your average earnings. Pools it does not recognize are labeled unknown.
 - Block found alerts: if a miner reports a block (AxeOS 2.11 or newer), a banner and confetti appear, and the bell button turns on browser notifications. Confirm any find on your pool page and mempool.space.
+- Block alert sound: a short fanfare plays when a block is found and repeats every minute until you dismiss the banner. The speaker button in the top bar turns it on or off and has a Play test button. Browsers only allow sound after you have clicked on the page once.
 - Bitcoin price, network data and pool statistics come from mempool.space and your pool's public pages. Use `--offline` to turn that off.
 - Compact view: the button next to the dark mode button switches to a denser layout that fits more on one screen. The choice is remembered.
 - Trash: hover over any card or panel and click the x to take it off the dashboard. The trash button in the top bar lists everything you removed, with Restore for each item and Restore all. This only hides it, and the miner keeps being monitored.

@@ -1277,6 +1277,12 @@ html.compact #sections>.panel,html.compact #sections>.grid,html.compact #section
 .trashpop .it span{flex:1}
 .trashpop .it small{display:block;color:var(--dim);font-size:11.5px}
 .trashpop .empty2{color:var(--dim);font-size:13px;padding:8px 0}
+
+.soundbtn .mut{display:none}
+.soundbtn.muted .spk{display:none}
+.soundbtn.muted .mut{display:block}
+.soundbtn.on{color:var(--orange);border-color:rgba(247,147,26,.5)}
+#soundPop{right:14px}
 </style>
 </head>
 <body>
@@ -1293,6 +1299,7 @@ html.compact #sections>.panel,html.compact #sections>.grid,html.compact #section
     <button class="btn icon" id="themeBtn" title="Switch between dark and light mode" aria-label="Toggle dark or light mode"><svg class="moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"/></svg><svg class="sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></button>
     <button class="btn icon" id="viewBtn" title="Switch between full and compact view" aria-label="Toggle full or compact view"><svg class="cmp" viewBox="0 0 24 24"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg><svg class="exp" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
     <button class="btn icon trashbtn" id="trashBtn" title="Trash: cards you removed from the dashboard" aria-label="Open trash"><svg viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg><span class="bdg" id="trashN">0</span></button>
+    <button class="btn icon soundbtn" id="soundBtn" title="Block alert sound" aria-label="Block alert sound"><svg class="spk" viewBox="0 0 24 24"><path d="M11 5L6 9H3v6h3l5 4zM15.5 8.5a5 5 0 010 7M18.5 5.5a9 9 0 010 13"/></svg><svg class="mut" viewBox="0 0 24 24"><path d="M11 5L6 9H3v6h3l5 4zM22 9l-6 6M16 9l6 6"/></svg></button>
     <button class="btn icon bell" id="bellBtn" title="Browser alerts when a block is found" aria-label="Toggle block found alerts"><svg viewBox="0 0 24 24"><path d="M6 8a6 6 0 0112 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 003.4 0"/></svg></button>
     <form class="add" id="addForm"><input id="addIp" placeholder="add miner IP" autocomplete="off"><button class="btn" type="submit">Add</button></form>
     <button class="btn pri" id="scanBtn" title="Scan the network again for new miners">&#8635; Refresh</button>
@@ -1300,6 +1307,7 @@ html.compact #sections>.panel,html.compact #sections>.grid,html.compact #section
   </div>
   <div class="tabs" id="tabs"><button data-t="monitor" class="on">Monitor</button><button data-t="tuner">Tuner</button></div>
   <div class="trashpop" id="trashPop"></div>
+  <div class="trashpop" id="soundPop"></div>
   <div class="scanbar" id="scanbar"><i id="scanfill"></i></div>
   <div class="msg" id="msg"></div>
 
@@ -1638,13 +1646,60 @@ function renderTrash(){
   const l=trashList();const pop=$("#trashPop");
   pop.innerHTML='<h3>Trash<span style="flex:1"></span>'+(l.length?'<button class="btn" id="trashAll">Restore all</button>':"")+"</h3>"+(l.length?l.map(id=>{const t=trashLabel(id);return '<div class="it"><span>'+esc(t[0])+"<small>"+esc(t[1])+'</small></span><button class="btn" data-restore="'+esc(id)+'">Restore</button></div>'}).join(""):'<div class="empty2">Nothing in the trash. Hover over a card and click the x to remove it from the dashboard.</div>');
 }
-$("#trashBtn").onclick=e=>{e.stopPropagation();const pop=$("#trashPop");pop.classList.toggle("on");if(pop.classList.contains("on"))renderTrash()};
+$("#trashBtn").onclick=e=>{e.stopPropagation();const pop=$("#trashPop");$("#soundPop").classList.remove("on");pop.classList.toggle("on");if(pop.classList.contains("on"))renderTrash()};
 $("#trashPop").addEventListener("click",e=>{
   e.stopPropagation();
   const r=e.target.closest("[data-restore]");if(r){trashRestore(r.dataset.restore);return}
   if(e.target.closest("#trashAll")){trashSave([]);markTrash();setTimeout(()=>{if(S.hist&&S.miners.length)renderAll()},60)}
 });
 document.addEventListener("click",()=>$("#trashPop").classList.remove("on"));
+
+const SND={ctx:null,repeat:null,count:0};
+function soundOn(){return store("sound")!=="0"}
+function sndCtx(){
+  try{
+    if(!SND.ctx){const A=window.AudioContext||window.webkitAudioContext;if(!A)return null;SND.ctx=new A()}
+    if(SND.ctx.state==="suspended")SND.ctx.resume();
+    return SND.ctx;
+  }catch(e){return null}
+}
+function sndNote(c,t,f,d,v,type){
+  const o=c.createOscillator(),g=c.createGain();
+  o.type=type||"triangle";o.frequency.value=f;
+  g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(v,t+0.015);g.gain.exponentialRampToValueAtTime(0.0001,t+d);
+  o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+d+0.05);
+}
+function playFanfare(){
+  const c=sndCtx();if(!c)return false;
+  const t=c.currentTime+0.05;
+  const run=[523.25,659.25,783.99,1046.5,783.99,1046.5,1318.5];
+  run.forEach((f,i)=>{const at=t+i*0.13;sndNote(c,at,f,0.45,0.22,"triangle");sndNote(c,at,f*2,0.3,0.06,"sine")});
+  const end=t+run.length*0.13+0.05;
+  [523.25,659.25,783.99,1046.5].forEach(f=>sndNote(c,end,f,1.3,0.12,"triangle"));
+  for(let k=0;k<3;k++){const at=end+0.5+k*0.28;sndNote(c,at,2093,0.5,0.07,"sine")}
+  return true;
+}
+function alertSound(){if(soundOn())playFanfare()}
+function alertRepeat(on){
+  if(on&&soundOn()){
+    if(!SND.repeat){SND.count=0;SND.repeat=setInterval(()=>{if(!soundOn()){alertRepeat(false);return}playFanfare()},60000)}
+  }else if(SND.repeat){clearInterval(SND.repeat);SND.repeat=null}
+}
+function soundSync(){
+  const on=soundOn();const b=$("#soundBtn");
+  b.classList.toggle("on",on);b.classList.toggle("muted",!on);
+  const pop=$("#soundPop");
+  pop.innerHTML='<h3>Block alert sound</h3><div class="it"><span>Sound<small>'+(on?"Plays when a block is found and again every minute until you dismiss the banner":"Muted")+'</small></span><button class="btn '+(on?"pri":"")+'" id="sndToggle">'+(on?"On":"Off")+'</button></div><div class="it"><span>Hear it first<small>Plays the alert once so you know what to expect</small></span><button class="btn" id="sndTest">Play test</button></div><div class="empty2">Your browser only allows sound after you have clicked on the page once, so keep this tab open and click anywhere after loading it.</div>';
+}
+$("#soundBtn").onclick=e=>{e.stopPropagation();const pop=$("#soundPop");$("#trashPop").classList.remove("on");pop.classList.toggle("on");soundSync()};
+$("#soundPop").addEventListener("click",e=>{
+  e.stopPropagation();
+  if(e.target.closest("#sndToggle")){store("sound",soundOn()?"0":"1");if(!soundOn())alertRepeat(false);soundSync();if(soundOn())playFanfare()}
+  if(e.target.closest("#sndTest")){if(!playFanfare())say("This browser could not play sound")}
+});
+document.addEventListener("click",()=>{$("#soundPop").classList.remove("on");sndCtx()});
+document.addEventListener("keydown",()=>{sndCtx()},{once:true});
+soundSync();
 function heatColor(c){return c>=68?"#fb7185":c>=64?"#fbbf24":c>=40?"#34d399":"#22d3ee"}
 function updateCard(m){
   let el=S.cards[m.ip];
@@ -1735,7 +1790,8 @@ function renderModalCharts(){
 }
 function renderBanner(){
   const el=$("#blockBanner");const found=S.miners.filter(m=>m.block&&m.block.count>m.block.acked);
-  if(!found.length){el.innerHTML="";if(document.title.startsWith("BLOCK FOUND"))document.title="Bitaxe Monitor";return}
+  if(!found.length){el.innerHTML="";if(document.title.startsWith("BLOCK FOUND"))document.title="Bitaxe Monitor";alertRepeat(false);return}
+  alertRepeat(true);
   const net=S.network||{},reward=net.reward_sats||312500000;
   let h='<div class="banner"><h2>BLOCK FOUND</h2>';
   found.forEach(m=>{
@@ -1748,7 +1804,7 @@ function renderBanner(){
     if(pl.address)h+='<a class="btn" href="https://mempool.space/address/'+esc(pl.address)+'" target="_blank" rel="noopener">View address on mempool.space</a>';
     h+='<button class="btn" data-ack="'+esc(m.ip)+'">Dismiss here</button></div>';
     const key=m.ip+":"+m.block.count;
-    if(!S.notified[key]){S.notified[key]=true;confetti();notify("Block found",nameOf(m.ip)+" reports a block found")}
+    if(!S.notified[key]){S.notified[key]=true;confetti();notify("Block found",nameOf(m.ip)+" reports a block found");alertSound()}
   });
   h+='<p style="font-weight:500;font-size:12.5px;margin-top:10px">Confirm it on your pool page and mempool.space. Dismissing hides this banner in the dashboard only and does not change the miner.</p></div>';
   el.innerHTML=h;document.title="BLOCK FOUND - Bitaxe Monitor";
