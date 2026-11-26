@@ -1068,14 +1068,13 @@ html[data-theme=light] .icon .moon{display:none}
 .tip div{display:flex;justify-content:space-between;gap:14px;font-variant-numeric:tabular-nums}
 .tip div i{width:8px;height:8px;border-radius:2px;display:inline-block;margin-right:6px}
 .sec{position:relative}
-.sec>.grip{position:absolute;top:-9px;left:50%;transform:translateX(-50%);z-index:5;width:64px;height:18px;border-radius:9px;background:var(--panel);border:1px solid var(--line);color:var(--mut,#8aa);font-size:11px;line-height:16px;text-align:center;cursor:grab;opacity:.55;transition:.15s;user-select:none;letter-spacing:2px}
+.sec>.grip{position:absolute;top:-9px;left:50%;transform:translateX(-50%);z-index:5;width:64px;height:18px;border-radius:9px;background:var(--panel);border:1px solid var(--line);color:var(--mut,#8aa);font-size:11px;line-height:16px;text-align:center;cursor:grab;opacity:0;transition:.15s;user-select:none;letter-spacing:2px}
 .sec:hover>.grip{opacity:1;border-color:rgba(34,211,238,.6)}
 .grip:active{cursor:grabbing}
 .dragging{opacity:.35;transform:scale(.98)}
 .card[draggable=true]{cursor:grab}
-#cards{align-items:start}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(400px,1fr));gap:14px}
-.card{position:relative;overflow:hidden;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:16px;cursor:pointer;transition:.2s;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.card{display:flex;flex-direction:column;position:relative;overflow:hidden;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:16px;cursor:pointer;transition:.2s;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
 .card:hover{transform:translateY(-2px);border-color:rgba(34,211,238,.5);box-shadow:0 14px 40px rgba(0,0,0,.45),0 0 30px rgba(34,211,238,.1)}
 .card.offline{opacity:.6;filter:saturate(.4)}
 .ch{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
@@ -1099,8 +1098,9 @@ html[data-theme=light] .icon .moon{display:none}
 .st .k{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);font-weight:700}
 .st .x{font-size:16px;font-weight:700;margin-top:1px;font-variant-numeric:tabular-nums}
 .spark{width:100%;height:56px;display:block;margin-top:10px}
-.foot{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--dim);margin-top:8px}
+.foot{margin-top:auto!important;padding-top:8px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--dim);margin-top:8px}
 .foot b{color:var(--txt);font-weight:600}
+.foot [data-k=pool]{flex:0 0 100%;min-height:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .heat{position:absolute;left:0;bottom:0;height:3px;width:0;background:var(--green);transition:width .6s,background .6s;box-shadow:0 0 12px currentColor}
 .modal{position:fixed;inset:0;background:var(--scrim);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:none;align-items:flex-start;justify-content:center;overflow:auto;padding:30px 16px;z-index:50}
 .modal.on{display:flex}
@@ -1257,6 +1257,8 @@ html.compact .tchart{height:200px}
 html.compact .pc{padding:8px 10px}
 html.compact .pc .set{font-size:16px}
 
+#sections>.panel,#sections>.grid,#sections>.kpis{margin-bottom:20px}
+html.compact #sections>.panel,html.compact #sections>.grid,html.compact #sections>.kpis{margin-bottom:10px}
 .trashed{display:none!important}
 .xbtn{position:absolute;top:7px;right:7px;z-index:6;width:22px;height:22px;border-radius:50%;border:1px solid var(--line);background:var(--panel);color:var(--dim);font-size:13px;line-height:20px;text-align:center;cursor:pointer;opacity:0;transition:.15s;padding:0}
 .xbtn:hover{color:var(--red);border-color:rgba(251,113,133,.6)}
