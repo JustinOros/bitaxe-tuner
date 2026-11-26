@@ -37,6 +37,20 @@ cd $HOME\bitaxe-tuner; powershell -ExecutionPolicy Bypass -File .\bitaxe-tuner.p
 
 Every option in this README works the same way after `bitaxe-tuner.ps1`. The helper keeps the PC awake while it runs. If `nmap` is missing, `--scan` offers to install it with winget.
 
+For the live dashboard on Windows, paste this into PowerShell. It downloads the helper, then Python (if needed, asking first), the monitor and the tuner, and opens the dashboard in your browser:
+
+```
+mkdir $HOME\bitaxe-tuner -Force | Out-Null; cd $HOME\bitaxe-tuner; iwr https://raw.githubusercontent.com/JustinOros/bitaxe-tuner/main/bitaxe-monitor.ps1 -OutFile bitaxe-monitor.ps1; powershell -ExecutionPolicy Bypass -File .\bitaxe-monitor.ps1
+```
+
+To start it again later, or to add miner IPs or `--lan`:
+
+```
+cd $HOME\bitaxe-tuner; powershell -ExecutionPolicy Bypass -File .\bitaxe-monitor.ps1 192.168.1.109
+```
+
+Press Ctrl+C in that window to stop it. The helper keeps the PC awake while it runs.
+
 Note: If you already know the IP address of your miner, run this command to get started (replace the example address with yours):
 
 ```
